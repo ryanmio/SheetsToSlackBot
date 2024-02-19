@@ -42,9 +42,9 @@ function formatDataForSlack(data) {
       isFirstCampaign = false;
       // Format the campaign name with bold markdown
       message += `*${row[0].slice(2, -2)}*\n`;
-    } else if (row[0].startsWith('*') && row[0].endsWith('*')) {
+    } else if (row[0] === '> *Since Last Update*') {
       // Format "Since Last Update" with bold markdown
-      message += `*${row[0].slice(1, -1)}*\n`;
+      message += `>*${row[0].slice(3, -1)}*\n`;
     } else {
       // Check if the row contains "Spent" or "Raised" to add a dollar sign
       if (row[0].includes("Spent") || row[0].includes("Raised")) {
@@ -76,6 +76,10 @@ function sendSlackMessage() {
   const token = scriptProperties.getProperty('SLACK_OAUTH_TOKEN'); // Ensure you have set this property beforehand
   console.log("SLACK_OAUTH_TOKEN retrieved successfully");
 
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const documentTitle = spreadsheet.getName(); // Get the document title
+  const sheetUrl = spreadsheet.getUrl(); // Get the URL of the active spreadsheet
+
   // Construct the payload with Block Kit blocks
   const payload = {
     channel: 'U0127C7UF16', // Replace with your actual channel ID
@@ -84,7 +88,7 @@ function sendSlackMessage() {
         "type": "header",
         "text": {
           "type": "plain_text",
-          "text": "Sheet Title",
+          "text": `${documentTitle} Readout`, // Use the document title with "Readout" appended
           "emoji": true
         }
       },
@@ -96,11 +100,19 @@ function sendSlackMessage() {
         }
       },
       {
-        "type": "section",
-        "text": {
-          "type": "mrkdwn",
-          "text": `<${SpreadsheetApp.getActiveSpreadsheet().getUrl()}|Open Sheet>`
-        }
+        "type": "actions",
+        "elements": [
+          {
+            "type": "button",
+            "text": {
+              "type": "plain_text",
+              "text": "Open Sheet",
+              "emoji": true
+            },
+            "url": sheetUrl,
+            "action_id": "button-action"
+          }
+        ]
       }
     ]
   };
