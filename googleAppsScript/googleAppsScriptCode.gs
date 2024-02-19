@@ -29,7 +29,26 @@ function getSheetData() {
 function formatDataForSlack(data) {
   let message = "";
   let isFirstCampaign = true;
-  let sheetUrl = SpreadsheetApp.getActiveSpreadsheet().getUrl(); // Get the URL of the active spreadsheet
+
+  // Helper function to format numbers with commas
+  function formatNumber(number) {
+    return parseInt(number, 10).toLocaleString('en-US');
+  }
+
+  // Helper function to format currency
+  function formatCurrency(amount) {
+    return parseFloat(amount).toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  // Helper function to format percentage
+  function formatPercentage(value) {
+    return (parseFloat(value) * 100).toFixed(2) + '%';
+  }
 
   // Iterate through each row of your data
   data.forEach((row) => {
@@ -46,13 +65,15 @@ function formatDataForSlack(data) {
       // Format "Since Last Update" with bold markdown
       message += `>*${row[0].slice(3, -1)}*\n`;
     } else {
-      // Check if the row contains "Spent" or "Raised" to add a dollar sign
+      // Check if the row contains "Spent", "Raised", or "Donations" to format accordingly
       if (row[0].includes("Spent") || row[0].includes("Raised")) {
-        message += `${row[0]}: $${row[1]}\n`;
+        message += `${row[0]}: ${formatCurrency(row[1])}\n`;
+      } else if (row[0].includes("Donations")) {
+        // Format Donations as a number with commas
+        message += `${row[0]}: ${formatNumber(row[1])}\n`;
       } else if (row[0].includes("ROI")) {
         // Format ROI as a percentage
-        let roi = parseFloat(row[1]) * 100;
-        message += `${row[0]}: ${roi.toFixed(2)}%\n`;
+        message += `${row[0]}: ${formatPercentage(row[1])}\n`;
       } else {
         // Add a data row with the key-value pair
         message += `${row[0]}: ${row[1]}\n`;
@@ -133,3 +154,7 @@ function sendSlackMessage() {
   const response = UrlFetchApp.fetch(slackApiUrl, options);
   console.log(`Slack API response: ${response.getContentText()}`);
 }
+
+
+
+
