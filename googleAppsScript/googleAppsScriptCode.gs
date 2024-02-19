@@ -29,6 +29,7 @@ function getSheetData() {
 function formatDataForSlack(data) {
   let message = "";
   let isFirstCampaign = true;
+  let sheetUrl = SpreadsheetApp.getActiveSpreadsheet().getUrl(); // Get the URL of the active spreadsheet
 
   // Iterate through each row of your data
   data.forEach((row) => {
@@ -41,12 +42,21 @@ function formatDataForSlack(data) {
       isFirstCampaign = false;
       // Format the campaign name with bold markdown
       message += `*${row[0].slice(2, -2)}*\n`;
-    } else if (row[0].startsWith('>') && row[0].includes('Since Last Update')) {
-      // Format "Since Last Update" with bold and quote markdown
-      message += `>*${row[0].slice(1)}*\n`;
+    } else if (row[0].startsWith('*') && row[0].endsWith('*')) {
+      // Format "Since Last Update" with bold markdown
+      message += `*${row[0].slice(1, -1)}*\n`;
     } else {
-      // Add a data row with the key-value pair
-      message += `${row[0]}: ${row[1]}\n`;
+      // Check if the row contains "Spent" or "Raised" to add a dollar sign
+      if (row[0].includes("Spent") || row[0].includes("Raised")) {
+        message += `${row[0]}: $${row[1]}\n`;
+      } else if (row[0].includes("ROI")) {
+        // Format ROI as a percentage
+        let roi = parseFloat(row[1]) * 100;
+        message += `${row[0]}: ${roi.toFixed(2)}%\n`;
+      } else {
+        // Add a data row with the key-value pair
+        message += `${row[0]}: ${row[1]}\n`;
+      }
     }
   });
 
@@ -89,7 +99,7 @@ function sendSlackMessage() {
         "type": "section",
         "text": {
           "type": "mrkdwn",
-          "text": "<https://googlesheet.com/sheetid|Open Sheet>"
+          "text": `<${SpreadsheetApp.getActiveSpreadsheet().getUrl()}|Open Sheet>`
         }
       }
     ]
