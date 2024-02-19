@@ -28,13 +28,22 @@ function getSheetData() {
 
 function formatDataForSlack(data) {
   let message = "";
+  let isFirstCampaign = true;
 
   // Iterate through each row of your data
   data.forEach((row) => {
-    // Check if it's a section header or a data row
-    if (row[1] === '') {
-      // Add a section header with bold formatting and extra newline for spacing
-      message += `*${row[0]}*\n\n`;
+    // Check if it's a campaign name
+    if (row[0].startsWith('**') && row[0].endsWith('**')) {
+      // Add a newline before each new campaign except the first
+      if (!isFirstCampaign) {
+        message += "\n";
+      }
+      isFirstCampaign = false;
+      // Format the campaign name with bold markdown
+      message += `*${row[0].slice(2, -2)}*\n`;
+    } else if (row[0].startsWith('>') && row[0].includes('Since Last Update')) {
+      // Format "Since Last Update" with bold and quote markdown
+      message += `>*${row[0].slice(1)}*\n`;
     } else {
       // Add a data row with the key-value pair
       message += `${row[0]}: ${row[1]}\n`;
