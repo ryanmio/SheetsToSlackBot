@@ -56,11 +56,34 @@ function sendSlackMessage() {
   const scriptProperties = PropertiesService.getScriptProperties();
   const token = scriptProperties.getProperty('SLACK_OAUTH_TOKEN'); // Ensure you have set this property beforehand
   console.log("SLACK_OAUTH_TOKEN retrieved successfully");
-  const userId = 'YOUR_SLACK_USER_ID'; // Replace with your actual Slack User ID
 
+  // Construct the payload with Block Kit blocks
   const payload = {
     channel: 'U0127C7UF16', // Replace with your actual channel ID
-    text: message // Send the message as a text string
+    blocks: [
+      {
+        "type": "header",
+        "text": {
+          "type": "plain_text",
+          "text": "Sheet Title",
+          "emoji": true
+        }
+      },
+      {
+        "type": "section",
+        "text": {
+          "type": "mrkdwn",
+          "text": message // Your pre-formatted markdown message
+        }
+      },
+      {
+        "type": "section",
+        "text": {
+          "type": "mrkdwn",
+          "text": "<https://googlesheet.com/sheetid|Open Sheet>"
+        }
+      }
+    ]
   };
   console.log(`Payload prepared: ${JSON.stringify(payload)}`);
 
