@@ -35,10 +35,10 @@ function sendSlackMessage() {
   // Use the Properties Service to securely store and access sensitive data like OAuth tokens
   const scriptProperties = PropertiesService.getScriptProperties();
   const token = scriptProperties.getProperty('SLACK_OAUTH_TOKEN'); // Ensure you have set this property beforehand
-  const channelId = 'YOUR_CHANNEL_ID'; // Replace with your actual channel ID
+  const userId = 'YOUR_SLACK_USER_ID'; // Replace with your actual Slack User ID
 
   const payload = JSON.stringify({
-    channel: channelId,
+    channel: U0127C7UF16,
     text: message
   });
 
@@ -54,3 +54,4 @@ function sendSlackMessage() {
   // Sending the message to Slack using the chat.postMessage API
   UrlFetchApp.fetch(slackApiUrl, options);
 }
+
