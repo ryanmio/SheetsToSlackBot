@@ -101,6 +101,9 @@ function sendSlackMessage() {
   const documentTitle = spreadsheet.getName(); // Get the document title
   const sheetUrl = spreadsheet.getUrl(); // Get the URL of the active spreadsheet
 
+  // Get the email address of the person running the script
+  const userEmail = Session.getActiveUser().getEmail();
+
   // Construct the payload with Block Kit blocks
   const payload = {
     channel: 'U0127C7UF16', // Replace with your actual channel ID
@@ -134,6 +137,15 @@ function sendSlackMessage() {
             "action_id": "button-action"
           }
         ]
+      },
+      {
+        "type": "context",
+        "elements": [
+          {
+            "type": "mrkdwn",
+            "text": `Message sent by: ${userEmail}`
+          }
+        ]
       }
     ]
   };
@@ -154,7 +166,3 @@ function sendSlackMessage() {
   const response = UrlFetchApp.fetch(slackApiUrl, options);
   console.log(`Slack API response: ${response.getContentText()}`);
 }
-
-
-
-
