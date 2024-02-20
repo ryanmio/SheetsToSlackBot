@@ -1,6 +1,19 @@
-// Configurable constants
+/**
+ * Slack Bot for Google Sheets Readout
+ * 
+ * Author: Ryan Mioduski
+ *
+ * Important:
+ * Before using the bot, you need to configure it with the correct Slack channel ID and
+ * the data range from which to fetch data in your Google Sheets document.
+ *
+ * For full documentation, please visit the GitHub repository:
+ * https://github.com/ryanmio/SheetsToSlackBot
+ */
+
+// Configuration 
 const SLACK_CHANNEL_ID = 'U0127C7UF16'; // Update this with your channel ID
-const DATA_RANGE_START = 'A1'; // Update this if you want to start from a different cell
+const DATA_RANGE_START = 'D13'; // Update this if you want to start from a different cell
 
 function onOpen() {
   const ui = SpreadsheetApp.getUi();
