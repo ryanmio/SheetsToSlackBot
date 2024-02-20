@@ -29,7 +29,6 @@ function getSheetData() {
     // Dynamically calculate the range based on DATA_RANGE_START
     const lastRow = sheet.getLastRow();
     const rangeStartColumn = DATA_RANGE_START.charAt(0);
-    // Assuming data spans two columns, adjust if your data structure changes
     const rangeEndColumn = String.fromCharCode(rangeStartColumn.charCodeAt(0) + 1);
     const range = sheet.getRange(`${DATA_RANGE_START}:${rangeEndColumn}${lastRow}`);
     console.log(`Defined range: ${range.getA1Notation()}`);
@@ -38,28 +37,31 @@ function getSheetData() {
     
     let filteredValues = [];
     let currentSection = [];
-    let skipSection = true;
+    let isCurrentSectionValid = false;
   
     values.forEach((row, index) => {
-      // Check if row is the start of a new section
-      if (row[0].startsWith('*')) {
-        // If moving to a new section, decide if previous section should be added
-        if (currentSection.length > 0 && !skipSection) {
+      // Check if row is the start of a new section or the end of the data
+      if (row[0].startsWith('*') || index === values.length - 1) {
+        // At the start of a new section, decide if the previous section should be added
+        if (currentSection.length > 0 && isCurrentSectionValid) {
+          // Add the previous section if it was valid
           filteredValues = filteredValues.concat(currentSection);
         }
-        // Reset for new section
-        currentSection = [row];
-        skipSection = true; // Assume skip until a non-zero/non-blank row is found
-      } else {
-        currentSection.push(row);
-        // Check if row should not be skipped (has meaningful data)
-        if (row.some(cell => cell !== '' && cell !== 0 && cell !== '0.00%')) {
-          skipSection = false;
-        }
+        // Reset for the new section
+        currentSection = [];
+        isCurrentSectionValid = false; // Reset flag
       }
   
-      // Ensure last section is added if not empty and not to be skipped
-      if (index === values.length - 1 && currentSection.length > 0 && !skipSection) {
+      // Add row to the current section
+      currentSection.push(row);
+  
+      // Check if the current row has meaningful data (not blank and not zero)
+      if (row[1] !== '' && row[1] !== 0 && row[1] !== '0.00%' && row[1] !== null) {
+        isCurrentSectionValid = true;
+      }
+  
+      // Special case for the last row of the data
+      if (index === values.length - 1 && isCurrentSectionValid) {
         filteredValues = filteredValues.concat(currentSection);
       }
     });
@@ -146,6 +148,12 @@ function sendSlackMessage() {
   // Get the email address of the person running the script
   const userEmail = Session.getActiveUser().getEmail();
 
+  // Get today's date and format it
+  const today = new Date();
+  const month = today.toLocaleString('default', { month: 'short' }); // 'Feb'
+  const day = today.getDate(); // 20
+  const formattedDate = `${month} ${day}`; // 'Feb 20'
+
   // Construct the payload with Block Kit blocks
   const payload = {
     channel: SLACK_CHANNEL_ID, 
@@ -154,7 +162,7 @@ function sendSlackMessage() {
         "type": "header",
         "text": {
           "type": "plain_text",
-          "text": `${documentTitle} Readout`, // Use the document title with "Readout" appended
+          "text": `${documentTitle} Readout - ${formattedDate}`, // Append the formatted date to the title
           "emoji": true
         }
       },
@@ -208,4 +216,3 @@ function sendSlackMessage() {
   const response = UrlFetchApp.fetch(slackApiUrl, options);
   console.log(`Slack API response: ${response.getContentText()}`);
 }
-
