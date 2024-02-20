@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+</head>
+<body>
+  <h2>Configuration</h2>
+  <form id="configForm">
+    <div>
+      <label for="dataRange">Data Range:</label>
+      <input type="text" id="dataRange" name="dataRange">
+    </div>
+    <div>
+      <label for="channelId">Slack Channel ID:</label>
+      <input type="text" id="channelId" name="channelId">
+    </div>
+    <button type="button" onclick="submitForm()">Save Configuration</button>
+  </form>
+
+  <script>
+    function submitForm() {
+      google.script.run.withSuccessHandler(function() {
+        google.script.host.close();
+      }).saveConfiguration(document.getElementById('dataRange').value, document.getElementById('channelId').value);
+    }
+  </script>
+</body>
+</html>
