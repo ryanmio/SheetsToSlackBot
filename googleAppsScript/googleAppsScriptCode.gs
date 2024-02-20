@@ -1,20 +1,23 @@
+// Configurable constants
+const SLACK_CHANNEL_ID = 'U0127C7UF16'; // Update this with your channel ID
+const DATA_RANGE_START = 'A1'; // Update this if you want to start from a different cell
+
 function onOpen() {
-  console.log("Opening Spreadsheet and adding custom menu");
   const ui = SpreadsheetApp.getUi();
-  // Adds a custom menu to the Google Sheets UI
   ui.createMenu('Slack Bot')
-    .addItem('Send Update to Slack', 'sendSlackMessage')
+    .addItem('Send Readout to Slack', 'sendSlackMessage')
     .addToUi();
-  console.log("Custom menu added successfully");
 }
 
 function getSheetData() {
   console.log("Fetching active sheet data");
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   
-  // Use the entire A:B range
-  const lastRow = sheet.getLastRow(); // Gets the last row with data in the sheet
-  const range = sheet.getRange(`A1:B${lastRow}`); // Adjusts the range to go from A1 to B and down to the last row with data
+  // Dynamically calculate the range based on DATA_RANGE_START
+  const lastRow = sheet.getLastRow();
+  const rangeStartColumn = DATA_RANGE_START.charAt(0);
+  const rangeEndColumn = String.fromCharCode(rangeStartColumn.charCodeAt(0) + 1);
+  const range = sheet.getRange(`${DATA_RANGE_START}:${rangeEndColumn}${lastRow}`);
   console.log(`Defined range: ${range.getA1Notation()}`);
 
   const values = range.getValues();
@@ -50,7 +53,7 @@ function formatDataForSlack(data) {
     return (parseFloat(value) * 100).toFixed(2) + '%';
   }
 
-  // Iterate through each row of your data
+  // Iterate through each row of the data
   data.forEach((row) => {
     // Check if it's a campaign name
     if (row[0].startsWith('**') && row[0].endsWith('**')) {
@@ -94,7 +97,7 @@ function sendSlackMessage() {
 
   // Use the Properties Service to securely store and access sensitive data like OAuth tokens
   const scriptProperties = PropertiesService.getScriptProperties();
-  const token = scriptProperties.getProperty('SLACK_OAUTH_TOKEN'); // Ensure you have set this property beforehand
+  const token = scriptProperties.getProperty('SLACK_OAUTH_TOKEN'); 
   console.log("SLACK_OAUTH_TOKEN retrieved successfully");
 
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
@@ -106,7 +109,7 @@ function sendSlackMessage() {
 
   // Construct the payload with Block Kit blocks
   const payload = {
-    channel: 'U0127C7UF16', // Replace with your actual channel ID
+    channel: SLACK_CHANNEL_ID, 
     blocks: [
       {
         "type": "header",
