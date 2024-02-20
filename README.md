@@ -1,69 +1,44 @@
-# Google Sheets to Slack Bot
+# Slack Bot for Google Sheets Readout Documentation
 
-This project provides a solution to send updates from a Google Sheet to a Slack channel or user, triggered either by a time-based schedule or by user interaction within Google Sheets or Slack. It leverages Google Apps Script to read data from Sheets and the Slack API to post messages.
+## Overview
+This Slack Bot is designed to send a formatted readout from a Google Sheets document directly to a specified Slack channel. It dynamically fetches data from the sheet, formats it into a readable message, and posts it to Slack, making it an efficient tool for sharing updates, reports, or any relevant data with your team.
 
 ## Features
+- **Dynamic Data Fetching:** Automatically fetches data from a specified range in a Google Sheets document.
+- **Custom Formatting:** Formats the fetched data into a Slack-friendly message using Slack's Block Kit.
+- **Easy Configuration:** Allows for simple configuration of the target Slack channel and data range directly within the script.
 
-- Fetch specific cell data from a Google Sheet.
-- Format the data into a readable message.
-- Send the message to a designated Slack channel or user.
-- Trigger the message sending through a time-based schedule or by user actions in Google Sheets or Slack.
+## Configuration
+Before using the bot, you need to configure it with the correct Slack channel ID and the data range from which to fetch data in your Google Sheets document.
 
-## Prerequisites
+### Setting Up Slack Channel ID and Data Range
+1. **Open the Google Apps Script File:** Navigate to Extensions > Apps Script from within your Google Sheets document.
+2. **Configure Constants:**
+   At the top of the `googleAppsScriptCode.gs` file, you'll find two configurable constants:
+   - `SLACK_CHANNEL_ID`: Replace `'U0127C7UF16'` with the ID of your target Slack channel.
+   - `DATA_RANGE_START`: Replace `'A1'` with the starting cell of your data range. The script will automatically extend this range to column D and the last row with data.
+   ```javascript
+   // Configurable constants
+   const SLACK_CHANNEL_ID = 'YOUR_SLACK_CHANNEL_ID'; // Update this with your actual channel ID
+   const DATA_RANGE_START = 'A1'; // Update this if you want to start from a different cell
+   ```
+3. **Save Changes:** After making the necessary changes, save the script file.
 
-- Access to Google Sheets and the ability to create and run Google Apps Scripts.
-- A Slack workspace with permissions to create apps and generate API tokens or set up incoming webhooks.
-- Basic knowledge of JavaScript and familiarity with JSON.
-
-## Setup Instructions
-
-### Setting Up Google Apps Script
-
-1. Open your Google Sheet.
-2. Navigate to Extensions > Apps Script.
-3. Replace the content of the script editor with the provided code (see `googleAppsScriptCode.gs`).
-4. Save and name your project.
-
-### Creating a Slack App
-
-1. Go to the [Slack API](https://api.slack.com/apps) and create a new app.
-2. Add permissions to send messages (`chat:write`).
-3. Generate your OAuth token or set up an incoming webhook.
-
-### Integrating Slack with Google Apps Script
-
-1. In your Apps Script, use `UrlFetchApp` to make a POST request to the Slack API with your message payload.
-2. Set up OAuth2 for Slack in Apps Script if required ([OAuth2 library](https://github.com/googleworkspace/apps-script-oauth2)).
-
-### Triggering Mechanisms
-
-#### Time-based Trigger
-
-- Set a time-driven trigger in Apps Script to run your function every morning.
-
-#### User Interaction in Google Sheets
-
-- Add a custom menu item or button that runs your script.
-
-#### User Interaction in Slack
-
-- Consider using Slack's interactive components like buttons or slash commands, which may require additional setup and a lightweight web service to handle requests.
+### Obtaining Slack Channel ID
+To find your Slack channel ID:
+1. Open Slack and navigate to the channel you want to post messages to.
+2. Click on the channel name at the top to open the channel details.
+3. Look for the channel ID in the URL or in the "About" section of the channel details.
 
 ## Usage
+After configuring the bot, you can trigger the readout to be sent to Slack directly from your Google Sheets document.
+1. **Open the Google Sheets Document:** Ensure you're in the document configured with the bot.
+2. **Send Readout to Slack:** Navigate to the custom menu item Slack Bot > Send Readout to Slack. Clicking this will execute the bot, fetching the data from the specified range, formatting it, and sending it to the configured Slack channel.
 
-- **Time-based Updates**: Once the time-based trigger is set, the script will automatically run at the specified time and send the update to Slack.
-- **Manual Trigger in Google Sheets**: Users can manually send updates by clicking on the custom button or menu item in the Google Sheet.
-- **Slack Interaction**: If set up, users can trigger updates directly from Slack using the configured components.
+## Troubleshooting
+- **Invalid Slack Channel ID:** Ensure the channel ID is correct and that the Slack app is installed in the channel.
+- **OAuth Token Permissions:** Verify that the Slack OAuth token has the `chat:write` permission and is correctly stored in the script properties.
+- **Data Range Issues:** Confirm the `DATA_RANGE_START` is correctly set and that there is data in the specified range.
 
-## Contributing
-
-Contributions to this project are welcome! Please fork the repository and submit a pull request with your proposed changes.
-
-## License
-
-This project is open-sourced under the [MIT License](LICENSE).
-
-## Acknowledgments
-
-- Google Apps Script Documentation
-- Slack API Documentation
+## Support
+For additional help or to report issues, please reach out to your team's technical support or consult the Slack API Documentation.
