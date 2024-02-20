@@ -23,24 +23,50 @@ function onOpen() {
 }
 
 function getSheetData() {
-  console.log("Fetching active sheet data");
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    console.log("Fetching active sheet data");
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   
-  // Dynamically calculate the range based on DATA_RANGE_START
-  const lastRow = sheet.getLastRow();
-  const rangeStartColumn = DATA_RANGE_START.charAt(0);
-  const rangeEndColumn = String.fromCharCode(rangeStartColumn.charCodeAt(0) + 1);
-  const range = sheet.getRange(`${DATA_RANGE_START}:${rangeEndColumn}${lastRow}`);
-  console.log(`Defined range: ${range.getA1Notation()}`);
-
-  const values = range.getValues();
+    // Dynamically calculate the range based on DATA_RANGE_START
+    const lastRow = sheet.getLastRow();
+    const rangeStartColumn = DATA_RANGE_START.charAt(0);
+    // Assuming data spans two columns, adjust if your data structure changes
+    const rangeEndColumn = String.fromCharCode(rangeStartColumn.charCodeAt(0) + 1);
+    const range = sheet.getRange(`${DATA_RANGE_START}:${rangeEndColumn}${lastRow}`);
+    console.log(`Defined range: ${range.getA1Notation()}`);
   
-  // Filter out empty rows based on the content of the first cell in each row
-  const filteredValues = values.filter(row => row[0] !== '');
-  console.log(`Data fetched from sheet: ${JSON.stringify(filteredValues)}`);
-
-  return filteredValues;
-}
+    const values = range.getValues();
+    
+    let filteredValues = [];
+    let currentSection = [];
+    let skipSection = true;
+  
+    values.forEach((row, index) => {
+      // Check if row is the start of a new section
+      if (row[0].startsWith('*')) {
+        // If moving to a new section, decide if previous section should be added
+        if (currentSection.length > 0 && !skipSection) {
+          filteredValues = filteredValues.concat(currentSection);
+        }
+        // Reset for new section
+        currentSection = [row];
+        skipSection = true; // Assume skip until a non-zero/non-blank row is found
+      } else {
+        currentSection.push(row);
+        // Check if row should not be skipped (has meaningful data)
+        if (row.some(cell => cell !== '' && cell !== 0 && cell !== '0.00%')) {
+          skipSection = false;
+        }
+      }
+  
+      // Ensure last section is added if not empty and not to be skipped
+      if (index === values.length - 1 && currentSection.length > 0 && !skipSection) {
+        filteredValues = filteredValues.concat(currentSection);
+      }
+    });
+  
+    console.log(`Data fetched from sheet: ${JSON.stringify(filteredValues)}`);
+    return filteredValues;
+  }
 
 function formatDataForSlack(data) {
   let message = "";
@@ -182,3 +208,4 @@ function sendSlackMessage() {
   const response = UrlFetchApp.fetch(slackApiUrl, options);
   console.log(`Slack API response: ${response.getContentText()}`);
 }
+
