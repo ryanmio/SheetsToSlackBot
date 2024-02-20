@@ -34,11 +34,3 @@ To find your Slack channel ID:
 After configuring the bot, you can trigger the readout to be sent to Slack directly from your Google Sheets document.
 1. **Open the Google Sheets Document:** Ensure you're in the document configured with the bot.
 2. **Send Readout to Slack:** Navigate to the custom menu item Slack Bot > Send Readout to Slack. Clicking this will execute the bot, fetching the data from the specified range, formatting it, and sending it to the configured Slack channel.
-
-## Troubleshooting
-- **Invalid Slack Channel ID:** Ensure the channel ID is correct and that the Slack app is installed in the channel.
-- **OAuth Token Permissions:** Verify that the Slack OAuth token has the `chat:write` permission and is correctly stored in the script properties.
-- **Data Range Issues:** Confirm the `DATA_RANGE_START` is correctly set and that there is data in the specified range.
-
-## Support
-For additional help or to report issues, please reach out to your team's technical support or consult the Slack API Documentation.
