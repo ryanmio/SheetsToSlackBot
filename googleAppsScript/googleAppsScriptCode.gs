@@ -5,7 +5,8 @@
  *
  * Important:
  * Before using the bot, you need to configure it with the correct Slack channel ID and
- * the data range from which to fetch data in your Google Sheets document.
+ * the data range from which to fetch data in your Google Sheets document. Optionally,
+ * you can also specify a Slack thread URL to direct the message to a specific thread.
  *
  * For full documentation, please visit the GitHub repository:
  * https://github.com/ryanmio/SheetsToSlackBot
@@ -14,7 +15,7 @@
 // Configuration 
 const SLACK_CHANNEL_ID = 'U0127C7UF16'; // Update this with your channel ID
 const DATA_RANGE_START = 'D13'; // Update this if you want to start from a different cell
-const SLACK_THREAD_URL = 'https://middleseat.slack.com/archives/C05L3LXEVCM/p1708349853499849?thread_ts=1695043703.826579&cid=C05L3LXEVCM'; // Update this with your thread URL
+const SLACK_THREAD_URL = ''; // Optional: Update this with your thread URL if you want to post to a specific thread
 
 function onOpen() {
   const ui = SpreadsheetApp.getUi();
@@ -155,13 +156,16 @@ function sendSlackMessage() {
   const day = today.getDate(); // 20
   const formattedDate = `${month} ${day}`; // 'Feb 20'
 
-  // Extract the thread_ts from the URL
-  const threadTs = extractThreadTsFromUrl(SLACK_THREAD_URL);
+  // Extract the thread_ts from the URL if provided
+  let threadTs = null;
+  if (SLACK_THREAD_URL) {
+    threadTs = extractThreadTsFromUrl(SLACK_THREAD_URL);
+  }
 
   // Construct the payload with Block Kit blocks
   const payload = {
     channel: SLACK_CHANNEL_ID, 
-    thread_ts: threadTs, // Include the thread_ts in the payload
+    ...(threadTs && { thread_ts: threadTs }), // Include the thread_ts in the payload if it exists
     blocks: [
       {
         "type": "header",
