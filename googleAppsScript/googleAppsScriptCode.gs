@@ -14,6 +14,7 @@
 // Configuration 
 const SLACK_CHANNEL_ID = 'U0127C7UF16'; // Update this with your channel ID
 const DATA_RANGE_START = 'D13'; // Update this if you want to start from a different cell
+const SLACK_THREAD_URL = 'https://middleseat.slack.com/archives/C05L3LXEVCM/p1708349853499849?thread_ts=1695043703.826579&cid=C05L3LXEVCM'; // Update this with your thread URL
 
 function onOpen() {
   const ui = SpreadsheetApp.getUi();
@@ -154,9 +155,13 @@ function sendSlackMessage() {
   const day = today.getDate(); // 20
   const formattedDate = `${month} ${day}`; // 'Feb 20'
 
+  // Extract the thread_ts from the URL
+  const threadTs = extractThreadTsFromUrl(SLACK_THREAD_URL);
+
   // Construct the payload with Block Kit blocks
   const payload = {
     channel: SLACK_CHANNEL_ID, 
+    thread_ts: threadTs, // Include the thread_ts in the payload
     blocks: [
       {
         "type": "header",
@@ -215,4 +220,8 @@ function sendSlackMessage() {
   console.log("Sending message to Slack");
   const response = UrlFetchApp.fetch(slackApiUrl, options);
   console.log(`Slack API response: ${response.getContentText()}`);
+}
+function extractThreadTsFromUrl(url) {
+  const matches = url.match(/thread_ts=(\d+\.\d+)/);
+  return matches ? matches[1] : null;
 }
