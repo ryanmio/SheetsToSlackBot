@@ -166,6 +166,7 @@ function sendSlackMessage() {
   const payload = {
     channel: SLACK_CHANNEL_ID, 
     ...(threadTs && { thread_ts: threadTs }), // Include the thread_ts in the payload if it exists
+    ...(threadTs && { reply_broadcast: true }), // Broadcast the reply to the channel if thread_ts is present
     blocks: [
       {
         "type": "header",
