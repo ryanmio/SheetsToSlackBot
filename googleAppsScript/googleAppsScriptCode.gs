@@ -33,10 +33,23 @@ function getNotes() {
   const notesRange = sheet.getRange(NOTES_RANGE);
   const notesValues = notesRange.getValues();
   
+  // Regular expression to match emoji patterns like :word:
+  const emojiPattern = /^:[a-zA-Z0-9_]+:/;
+
   // Filter out empty rows and format notes
   const notes = notesValues
     .filter(note => note[0].trim() !== '') // Remove empty notes
-    .map(note => `:warning: ${note[0]}`); // Prefix each note with a warning emoji
+    .map(note => {
+      // Check if the note starts with an emoji pattern
+      const startsWithEmoji = emojiPattern.test(note[0].trim());
+      if (startsWithEmoji) {
+        // If it starts with an emoji, use it as is
+        return note[0].trim();
+      } else {
+        // If not, prefix the note with the :warning: emoji
+        return `:warning: ${note[0].trim()}`;
+      }
+    });
   
   return notes;
 }
@@ -185,15 +198,17 @@ function sendSlackMessage() {
 
   // Extract the thread_ts from the URL if provided
   let threadTs = null;
+  let replyBroadcast = false; // Default to not broadcasting
   if (SLACK_THREAD_URL) {
     threadTs = extractThreadTsFromUrl(SLACK_THREAD_URL);
+    replyBroadcast = true; // Set to true to broadcast the reply to the channel
   }
 
   // Construct the payload with Block Kit blocks
   const payload = {
     channel: SLACK_CHANNEL_ID, 
     ...(threadTs && { thread_ts: threadTs }), // Include the thread_ts in the payload if it exists
-    ...(threadTs && { reply_broadcast: true }), // Broadcast the reply to the channel if thread_ts is present
+    ...(threadTs && { reply_broadcast: replyBroadcast }), // Include reply_broadcast if thread_ts is present
     blocks: [
       {
         "type": "header",
