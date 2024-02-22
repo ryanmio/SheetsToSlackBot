@@ -4,7 +4,7 @@
 This Slack Bot sends a formatted readout from a Google Sheets document to a specified Slack channel or thread. It dynamically fetches data from the sheet, formats it into a readable message, and posts it to Slack.
 
 ## Configuration
-Before using the bot, you need to configure it with the correct Slack channel ID, the data range from which to fetch data in your Google Sheets document, and optionally, a Slack thread URL and notes range.
+Before using the bot, you need to configure it with the correct Slack channel ID, the data range from which to fetch data in your Google Sheets document, and optionally, a Slack thread URL and notes range. Additionally, you must set up an OAuth token as a script property for authentication with the Slack API.
 
 ### Setting Up Slack Channel ID, Data Range, and Optional Configurations
 1. **Open the Google Apps Script File:** Navigate to Extensions > Apps Script from within your Google Sheets document.
@@ -21,7 +21,17 @@ Before using the bot, you need to configure it with the correct Slack channel ID
    const SLACK_THREAD_URL = ''; // Optional: Update this with your thread URL
    const NOTES_RANGE = 'A1:A'; // Optional: Update this with your notes range
    ```
-3. **Save Changes:** After making the necessary changes, save the script file.
+3. **Set Up OAuth Token as a Script Property:**
+   - Go to the Script Editor by navigating to Extensions > Apps Script.
+   - In the Apps Script editor, click on `File` > `Project properties` > `Script properties`.
+   - Click `Add row`.
+   - Enter `SLACK_OAUTH_TOKEN` as the property name.
+   - Paste your Slack OAuth token as the value.
+   - Click `Save`.
+   
+   This OAuth token is used for authentication with the Slack API and allows your script to post messages to your Slack workspace.
+
+4. **Save Changes:** After making the necessary changes, save the script file.
 
 ### Obtaining Slack Channel ID
 To find your Slack channel ID:
