@@ -6,7 +6,8 @@
  * Important:
  * Before using the bot, you need to configure it with the correct Slack channel ID and
  * the data range from which to fetch data in your Google Sheets document. Optionally,
- * you can also specify a Slack thread URL to direct the message to a specific thread.
+ * you can also specify a Slack thread URL to direct the message to a specific thread and
+ * a notes range for including flags at the top of the readouts.
  *
  * For full documentation, please visit the GitHub repository:
  * https://github.com/ryanmio/SheetsToSlackBot
@@ -16,12 +17,28 @@
 const SLACK_CHANNEL_ID = 'U0127C7UF16'; // Update this with your channel ID
 const DATA_RANGE_START = 'D13'; // Update this if you want to start from a different cell
 const SLACK_THREAD_URL = ''; // Optional: Update this with your thread URL if you want to post to a specific thread
+const NOTES_RANGE = 'A1:A'; // Optional: Update this with your notes range
 
 function onOpen() {
   const ui = SpreadsheetApp.getUi();
   ui.createMenu('Slack Bot')
     .addItem('Send Readout to Slack', 'sendSlackMessage')
     .addToUi();
+}
+
+function getNotes() {
+  if (!NOTES_RANGE) return []; // Return an empty array if NOTES_RANGE is not configured
+
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const notesRange = sheet.getRange(NOTES_RANGE);
+  const notesValues = notesRange.getValues();
+  
+  // Filter out empty rows and format notes
+  const notes = notesValues
+    .filter(note => note[0].trim() !== '') // Remove empty notes
+    .map(note => `:warning: ${note[0]}`); // Prefix each note with a warning emoji
+  
+  return notes;
 }
 
 function getSheetData() {
@@ -74,6 +91,16 @@ function getSheetData() {
 
 function formatDataForSlack(data) {
   let message = "";
+  const notes = getNotes();
+
+  // If there are notes, add them to the top of the message
+  if (notes.length > 0) {
+    notes.forEach(note => {
+      message += `${note}\n`; // Add each note to the message
+    });
+    message += "\n"; // Add a newline after the notes section
+  }
+
   let isFirstCampaign = true;
 
   // Helper function to format numbers with commas
@@ -180,7 +207,7 @@ function sendSlackMessage() {
         "type": "section",
         "text": {
           "type": "mrkdwn",
-          "text": message // Your pre-formatted markdown message
+          "text": message // pre-formatted markdown message payload
         }
       },
       {
