@@ -18,6 +18,7 @@ const SLACK_CHANNEL_ID = 'U0127C7UF16'; // Update this with your channel ID
 const DATA_RANGE_START = 'D13'; // Update this if you want to start from a different cell
 const SLACK_THREAD_URL = ''; // Optional: Update this with your thread URL if you want to post to a specific thread
 const NOTES_RANGE = 'A1:A'; // Optional: Update this with your notes range
+// End Configuration
 
 function onOpen() {
   const ui = SpreadsheetApp.getUi();
@@ -178,7 +179,7 @@ function sendSlackMessage() {
   const slackApiUrl = 'https://slack.com/api/chat.postMessage';
   console.log(`Message to send: ${message}`);
 
-  // Use the Properties Service to securely store and access sensitive data like OAuth tokens
+  // Use the Properties Service to securely store and access the OAuth token
   const scriptProperties = PropertiesService.getScriptProperties();
   const token = scriptProperties.getProperty('SLACK_OAUTH_TOKEN'); 
   console.log("SLACK_OAUTH_TOKEN retrieved successfully");
