@@ -267,16 +267,29 @@ function sendSlackMessage() {
   };
   console.log("Options for UrlFetchApp prepared");
 
-  // Sending the message to Slack using the chat.postMessage API
+  // Sending the message to Slack
   console.log("Sending message to Slack");
   const response = UrlFetchApp.fetch(slackApiUrl, options);
-  console.log(`Slack API response: ${response.getContentText()}`);
+  const responseJson = JSON.parse(response.getContentText());
+
+  // Check if the Slack message was successfully sent
+  let slackMessageSuccess = true;
+  if (!responseJson.ok) {
+    console.error(`Failed to send message to Slack: ${responseJson.error}`);
+    slackMessageSuccess = false;
+  }
 
   // Perform copy-paste operation after sending the message
-  const copyPasteFeedback = copyPasteValues();
+  const copyPasteSuccess = copyPasteValues();
 
-  // Provide feedback to the user
-  SpreadsheetApp.getUi().alert(copyPasteFeedback);
+  // Provide feedback to the user based on the operation outcomes
+  if (slackMessageSuccess && copyPasteSuccess) {
+    SpreadsheetApp.getUi().alert("Readout Complete!");
+  } else if (!slackMessageSuccess) {
+    SpreadsheetApp.getUi().alert("Failed to send message to Slack. Please check the logs for more details.");
+  } else if (!copyPasteSuccess) {
+    SpreadsheetApp.getUi().alert("Readout sent to Slack, but there was an error with the copy-paste operation. Please check the logs for more details.");
+  }
 }
 
 function extractThreadTsFromUrl(url) {
@@ -287,7 +300,7 @@ function extractThreadTsFromUrl(url) {
 function copyPasteValues() {
   if (!COPY_RANGE || !PASTE_RANGE) {
     console.log("Copy-Paste ranges are not configured. Skipping this step.");
-    return "Copy-Paste operation skipped due to missing configuration.";
+    return true; // Return true since this isn't an error, just a skipped operation
   }
 
   try {
@@ -300,9 +313,9 @@ function copyPasteValues() {
     targetRange.setValues(values);
 
     console.log("Values copied successfully.");
-    return "Values copied successfully.";
+    return true;
   } catch (error) {
     console.error("Error during copy-paste operation: ", error);
-    return "Error during copy-paste operation. Please check the console for more details.";
+    return false;
   }
 }
