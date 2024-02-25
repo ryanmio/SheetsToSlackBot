@@ -1,6 +1,6 @@
 /**
  * Slack Bot for Google Sheets Readout
- * 
+ * Version: 1.0.0
  * Author: Ryan Mioduski
  *
  * Important:
