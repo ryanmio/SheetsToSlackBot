@@ -1,13 +1,14 @@
 /**
  * Slack Bot for Google Sheets Readout
- * Version: 1.0.0
+ * Version: 2.0.0
  * Author: Ryan Mioduski
  *
  * Important:
  * Before using the bot, you need to configure it with the correct Slack channel ID and
  * the data range from which to fetch data in your Google Sheets document. Optionally,
- * you can also specify a Slack thread URL to direct the message to a specific thread and
- * a notes range for including flags at the top of the readouts.
+ * you can also specify a Slack thread URL to direct the message to a specific thread,
+ * a notes range for including flags at the top of the readouts, and ranges for copying
+ * and pasting values within the sheet as part of the operation.
  *
  * For full documentation, please visit the GitHub repository:
  * https://github.com/ryanmio/SheetsToSlackBot
@@ -15,9 +16,11 @@
 
 // Configuration 
 const SLACK_CHANNEL_ID = 'U0127C7UF16'; // Update this with your channel ID
-const DATA_RANGE_START = 'D13'; // Update this if you want to start from a different cell
+const DATA_RANGE_START = 'B35'; // Update this if you want to start from a different cell
 const SLACK_THREAD_URL = ''; // Optional: Update this with your thread URL if you want to post to a specific thread
-const NOTES_RANGE = 'A1:A'; // Optional: Update this with your notes range
+const NOTES_RANGE = 'E43:E'; // Optional: Update this with your notes range
+const COPY_RANGE = 'B14:U17'; // Optional: Update this with your copy range
+const PASTE_RANGE = 'B26:U29'; // Optional: Update this with your paste range
 // End Configuration
 
 function onOpen() {
@@ -268,8 +271,38 @@ function sendSlackMessage() {
   console.log("Sending message to Slack");
   const response = UrlFetchApp.fetch(slackApiUrl, options);
   console.log(`Slack API response: ${response.getContentText()}`);
+
+  // Perform copy-paste operation after sending the message
+  const copyPasteFeedback = copyPasteValues();
+
+  // Provide feedback to the user
+  SpreadsheetApp.getUi().alert(copyPasteFeedback);
 }
+
 function extractThreadTsFromUrl(url) {
   const matches = url.match(/thread_ts=(\d+\.\d+)/);
   return matches ? matches[1] : null;
+}
+
+function copyPasteValues() {
+  if (!COPY_RANGE || !PASTE_RANGE) {
+    console.log("Copy-Paste ranges are not configured. Skipping this step.");
+    return "Copy-Paste operation skipped due to missing configuration.";
+  }
+
+  try {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    const sourceRange = sheet.getRange(COPY_RANGE);
+    const targetRange = sheet.getRange(PASTE_RANGE);
+
+    // Copy values from source to target
+    const values = sourceRange.getValues();
+    targetRange.setValues(values);
+
+    console.log("Values copied successfully.");
+    return "Values copied successfully.";
+  } catch (error) {
+    console.error("Error during copy-paste operation: ", error);
+    return "Error during copy-paste operation. Please check the console for more details.";
+  }
 }
