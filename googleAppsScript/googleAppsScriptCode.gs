@@ -1,6 +1,6 @@
 /**
  * Slack Bot for Google Sheets Readout
- * Version: 2.0.0
+ * Version: 3.0.0
  * Author: Ryan Mioduski
  *
  * Important:
@@ -106,20 +106,6 @@ function getSheetData() {
     return filteredValues;
   }
 
-function formatDataForSlack(data) {
-  let message = "";
-  const notes = getNotes();
-
-  // If there are notes, add them to the top of the message
-  if (notes.length > 0) {
-    notes.forEach(note => {
-      message += `${note}\n`; // Add each note to the message
-    });
-    message += "\n"; // Add a newline after the notes section
-  }
-
-  let isFirstCampaign = true;
-
   // Helper function to format numbers with commas
   function formatNumber(number) {
     return parseInt(number, 10).toLocaleString('en-US');
@@ -140,47 +126,60 @@ function formatDataForSlack(data) {
     return (parseFloat(value) * 100).toFixed(2) + '%';
   }
 
-  // Iterate through each row of the data
-  data.forEach((row) => {
+function formatDataForSlack(data) {
+  const blocks = []; // Initialize an array to hold all blocks
+  let currentCampaignText = "";
+  data.forEach((row, index) => {
     // Check if it's a campaign name
-    if (row[0].startsWith('**') && row[0].endsWith('**')) {
-      // Add a newline before each new campaign except the first
-      if (!isFirstCampaign) {
-        message += "\n";
+    if (row[0].startsWith('*') && row[0].endsWith('*')) {
+      // If there's current campaign text, push it as a block before starting a new one
+      if (currentCampaignText !== "") {
+        blocks.push({
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": currentCampaignText.trim()
+          }
+        });
+        currentCampaignText = ""; // Reset the campaign text for the next campaign
       }
-      isFirstCampaign = false;
-      // Format the campaign name with bold markdown
-      message += `*${row[0].slice(2, -2)}*\n`;
-    } else if (row[0] === '> *Since Last Update*') {
-      // Format "Since Last Update" with bold markdown
-      message += `>*${row[0].slice(3, -1)}*\n`;
+      // Start the new campaign text with the campaign name (removing asterisks)
+      currentCampaignText += `*${row[0].slice(1, -1)}*\n`;
     } else {
-      // Check if the row contains "Spent", "Raised", or "Donations" to format accordingly
+      // For data rows, append them to the current campaign's text with appropriate formatting
+      let formattedValue = row[1];
       if (row[0].includes("Spent") || row[0].includes("Raised")) {
-        message += `${row[0]}: ${formatCurrency(row[1])}\n`;
+        formattedValue = formatCurrency(row[1]);
       } else if (row[0].includes("Donations")) {
-        // Format Donations as a number with commas
-        message += `${row[0]}: ${formatNumber(row[1])}\n`;
+        formattedValue = formatNumber(row[1]);
       } else if (row[0].includes("ROI")) {
-        // Format ROI as a percentage
-        message += `${row[0]}: ${formatPercentage(row[1])}\n`;
-      } else {
-        // Add a data row with the key-value pair
-        message += `${row[0]}: ${row[1]}\n`;
+        formattedValue = formatPercentage(row[1]);
       }
+      currentCampaignText += `${row[0]}: ${formattedValue}\n`;
+    }
+
+    // Ensure the last campaign's text is also added as a block
+    if (index === data.length - 1 && currentCampaignText !== "") {
+      blocks.push({
+        "type": "section",
+        "text": {
+          "type": "mrkdwn",
+          "text": currentCampaignText.trim()
+        }
+      });
     }
   });
 
-  return message.trim(); // Trim the trailing newline character if present
+  return blocks;
 }
 
 function sendSlackMessage() {
   console.log("Preparing to send Slack message");
+  const notes = getNotes(); // Fetch notes
   const data = getSheetData();
-  const message = formatDataForSlack(data); // Get the formatted message
+  const campaignBlocks = formatDataForSlack(data); // Get the blocks for each campaign
 
   const slackApiUrl = 'https://slack.com/api/chat.postMessage';
-  console.log(`Message to send: ${message}`);
 
   // Use the Properties Service to securely store and access the OAuth token
   const scriptProperties = PropertiesService.getScriptProperties();
@@ -209,26 +208,26 @@ function sendSlackMessage() {
   }
 
   // Construct the payload with Block Kit blocks
-  const payload = {
-    channel: SLACK_CHANNEL_ID, 
-    ...(threadTs && { thread_ts: threadTs }), // Include the thread_ts in the payload if it exists
-    ...(threadTs && { reply_broadcast: replyBroadcast }), // Include reply_broadcast if thread_ts is present
+  let payload = {
+    channel: SLACK_CHANNEL_ID,
     blocks: [
       {
         "type": "header",
         "text": {
           "type": "plain_text",
-          "text": `${documentTitle} Readout - ${formattedDate}`, // Append the formatted date to the title
+          "text": `${documentTitle} Readout - ${formattedDate}`,
           "emoji": true
         }
       },
-      {
+      // If there are notes, add them as a section block at the top
+      ...(notes.length > 0 ? [{
         "type": "section",
         "text": {
           "type": "mrkdwn",
-          "text": message // pre-formatted markdown message payload
+          "text": notes.join('\n') // Join all notes with a newline
         }
-      },
+      }] : []),
+      ...campaignBlocks, // Spread the campaign blocks here
       {
         "type": "actions",
         "elements": [
@@ -253,7 +252,9 @@ function sendSlackMessage() {
           }
         ]
       }
-    ]
+    ],
+    ...(threadTs && { thread_ts: threadTs }), // Include the thread_ts in the payload if it exists
+    ...(threadTs && { reply_broadcast: replyBroadcast }) // Include reply_broadcast if thread_ts is present
   };
   console.log(`Payload prepared: ${JSON.stringify(payload)}`);
 
