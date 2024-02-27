@@ -161,12 +161,14 @@ function formatDataForSlack(data) {
 
       // Check for "Since Last Update" and add a line break before it
       if (row[0].startsWith('> *Since Last Update*')) {
-        currentCampaignText += `> ${row[0].slice(2).trim()}\n`; // Format "Since Last Update" as a quote
+        currentCampaignText += `\n> ${row[0].slice(2).trim()}\n`; // Format "Since Last Update" as a quote
         sinceLastUpdateFlag = true;
       } else if (sinceLastUpdateFlag) {
-        // Indent and format the "Since Last Update" section as a quote
-        currentCampaignText += `\n> ${row[0].trim()}: ${formattedValue}`;
+        // If the row is part of the "Since Last Update" section but not the title, strip the leading ">" and format as a quote
+        let rowData = row[0].startsWith('>') ? row[0].slice(1).trim() : row[0].trim();
+        currentCampaignText += `> ${rowData}: ${formattedValue}\n`;
       } else {
+        // For rows not part of the "Since Last Update" section, add them normally
         currentCampaignText += `${row[0].trim()}: ${formattedValue}\n`;
       }
     }
