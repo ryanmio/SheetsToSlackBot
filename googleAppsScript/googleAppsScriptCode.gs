@@ -143,6 +143,10 @@ function formatDataForSlack(data) {
             "text": currentCampaignText.trim()
           }
         });
+        // Add a divider block here
+        blocks.push({
+          "type": "divider"
+        });
         currentCampaignText = ""; // Reset the campaign text for the next campaign
       }
       // Start the new campaign text with the campaign name (removing asterisks)
