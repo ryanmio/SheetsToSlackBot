@@ -129,6 +129,8 @@ function getSheetData() {
 function formatDataForSlack(data) {
   const blocks = []; // Initialize an array to hold all blocks
   let currentCampaignText = "";
+  let sinceLastUpdateFlag = false; // Flag to track the "Since Last Update" section
+
   data.forEach((row, index) => {
     // Check if it's a campaign name
     if (row[0].startsWith('*') && row[0].endsWith('*')) {
@@ -145,6 +147,7 @@ function formatDataForSlack(data) {
       }
       // Start the new campaign text with the campaign name (removing asterisks)
       currentCampaignText += `*${row[0].slice(1, -1)}*\n`;
+      sinceLastUpdateFlag = false; // Reset the flag for the new campaign
     } else {
       // For data rows, append them to the current campaign's text with appropriate formatting
       let formattedValue = row[1];
@@ -155,7 +158,17 @@ function formatDataForSlack(data) {
       } else if (row[0].includes("ROI")) {
         formattedValue = formatPercentage(row[1]);
       }
-      currentCampaignText += `${row[0]}: ${formattedValue}\n`;
+
+      // Check for "Since Last Update" and add a line break before it
+      if (row[0].startsWith('> *Since Last Update*')) {
+        currentCampaignText += `> ${row[0].slice(2).trim()}\n`; // Format "Since Last Update" as a quote
+        sinceLastUpdateFlag = true;
+      } else if (sinceLastUpdateFlag) {
+        // Indent and format the "Since Last Update" section as a quote
+        currentCampaignText += `\n> ${row[0].trim()}: ${formattedValue}`;
+      } else {
+        currentCampaignText += `${row[0].trim()}: ${formattedValue}\n`;
+      }
     }
 
     // Ensure the last campaign's text is also added as a block
