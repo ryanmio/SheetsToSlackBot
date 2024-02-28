@@ -47,5 +47,10 @@ After configuring the bot, you can trigger the readout to be sent to Slack direc
 ### Including Notes in Your Readout
 If you have configured a `NOTES_RANGE`, the script will fetch each note from this range and include it at the top of your Slack message. Notes starting with an emoji pattern (`:word:`) will retain their custom emoji. Otherwise, notes will be prefixed with a :warning: emoji to highlight them.
 
-### Posting to a Specific Thread
+### Posting in a Thread
 If you have provided a `SLACK_THREAD_URL` in the configuration, the message will be sent as a reply to the specified thread. To post to a different thread, simply update the `SLACK_THREAD_URL` with the new thread's URL. Leave `SLACK_THREAD_URL` blank to post directly to the channel.
+
+**Important Note on Thread URLs:**  
+To ensure your message correctly threads in Slack, your `SLACK_THREAD_URL` must include a thread timestamp (`thread_ts`). This often means copying the link of the **second message** in the thread to get a URL with the necessary `thread_ts`.  
+**Example Thread URL with `thread_ts`:**  
+`https://workspace.slack.com/archives/C0123456D/p1234567890?thread_ts=1709043099.993519&cid=C123456D`
