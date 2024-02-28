@@ -13,13 +13,11 @@
  */
 
 // Configuration
-const SLACK_CHANNEL_ID = 'U0127C7UF16'; // Update this with your channel ID
-const BOT_VERSION = '3.1.0'; // Update this with the new version number
+const UPDATE_NOTIFICATION_SLACK_CHANNEL_ID = 'U0127C7UF16'; // Update this with your channel ID
+const BOT_VERSION = 'v3.0.0'; // Update this with the new version number
 const CHANGE_LOG = [
-  "Added new data visualization features.",
-  "Improved performance for large datasets.",
-  "Fixed issue with time zone discrepancies.",
-  "Updated user interface for better usability."
+  "Added automatic copying and pasting for since last update values.",
+  "Introduced dividers and block support for better message formatting, especially on mobile."
 ];
 // End Configuration
 
@@ -34,7 +32,7 @@ function sendUpdateNotification() {
   }
 
   const payload = {
-    channel: SLACK_CHANNEL_ID,
+    channel: UPDATE_NOTIFICATION_SLACK_CHANNEL_ID,
     text: `Slack Readout Bot Updated to ${BOT_VERSION}`,
     blocks: [
       {
@@ -58,7 +56,25 @@ function sendUpdateNotification() {
           type: "mrkdwn",
           text: `- ${change}`
         }
-      }))
+      })),
+      {
+        type: "divider"
+      },
+      {
+        type: "actions",
+        elements: [
+          {
+            type: "button",
+            text: {
+              type: "plain_text",
+              text: "View Documentation",
+              emoji: true
+            },
+            url: "https://github.com/ryanmio/SheetsToSlackBot",
+            action_id: "view_documentation"
+          }
+        ]
+      }
     ]
   };
 
