@@ -40,9 +40,9 @@ function getNotes() {
   // Regular expression to match emoji patterns like :word:
   const emojiPattern = /^:[a-zA-Z0-9_]+:/;
 
-  // Filter out empty rows and format notes
+  // Filter out empty rows, rows with only "#N/A", and format notes
   const notes = notesValues
-    .filter(note => note[0].trim() !== '') // Remove empty notes
+    .filter(note => note[0].trim() !== '' && note[0].trim().toUpperCase() !== '#N/A') // Remove empty notes and notes with only "#N/A"
     .map(note => {
       // Check if the note starts with an emoji pattern
       const startsWithEmoji = emojiPattern.test(note[0].trim());
