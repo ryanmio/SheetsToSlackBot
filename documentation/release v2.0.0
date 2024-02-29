@@ -1,0 +1,15 @@
+# Release Notes for Version 2.0.0
+
+## New Features
+
+- **Copy-Paste Support:** This version introduces the ability to configure ranges for copying and pasting values within the Google Sheet as part of the operation. This feature enhances the bot's functionality by allowing it to perform additional data manipulation tasks automatically. Users can specify the ranges they wish to copy from and paste to by updating the `COPY_RANGE` and `PASTE_RANGE` variables in the configuration section.
+
+## Enhancements
+
+- **Updated Data Range Start:** The default starting cell for data range has been updated to `B35` from `D13`.
+- **Updated Notes Range:** The notes range has been updated to `E43:E` from `A1:A`.
+
+## Important Notes
+
+- Before using the new copy-paste feature, ensure that the `COPY_RANGE` and `PASTE_RANGE` are correctly configured to match your Google Sheet's layout. Incorrect configuration may lead to unexpected behavior.
+

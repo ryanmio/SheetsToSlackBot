@@ -1,0 +1,23 @@
+# Release Notes for Version 3.0.0
+
+## Major Updates
+
+- **Dynamic Block Kit Messages:** Introduced dynamic Block Kit messages. Each campaign from Google Sheets is now converted into individual blocks for Slack messages, allowing for a series of blocks to compose the entire message.
+
+## New Features
+
+- **Customizable Slack Messages:** Users can customize the appearance and structure of Slack messages more extensively.
+- **Divider Blocks:** Divider blocks are automatically inserted between campaign blocks to improve message readability.
+
+## Enhancements
+
+- **Data Alignment and Markdown Support:** Enhanced data alignment and markdown support within text elements.
+- **Message Formatting:** Adjusted message formatting to align more closely with Slack's design recommendations.
+
+## Technical Improvements
+
+- **Google Apps Script Optimization:** Optimized Google Apps Script code to support dynamic creation of Block Kit messages, including more efficient data range handling and improved error handling.
+
+## Important Notes
+
+- **Configuration Review:** Review configuration settings for compatibility with new features, especially COPY_RANGE and PASTE_RANGE settings for copy-paste functionality within Google Sheets.
