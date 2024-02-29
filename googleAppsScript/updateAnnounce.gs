@@ -70,7 +70,7 @@ function sendUpdateNotification() {
               text: "View Documentation",
               emoji: true
             },
-            url: "https://github.com/ryanmio/SheetsToSlackBot",
+            url: "https://github.com/ryanmio/SheetsToSlackBot/releases/tag/v3.0.0",
             action_id: "view_documentation"
           }
         ]
