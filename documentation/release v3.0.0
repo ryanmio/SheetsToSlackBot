@@ -21,3 +21,8 @@
 ## Important Notes
 
 - **Configuration Review:** Review configuration settings for compatibility with new features, especially COPY_RANGE and PASTE_RANGE settings for copy-paste functionality within Google Sheets.
+
+
+# Release Notes for Version 3.0.1
+
+- **Skip notes if blank or #N/A:** Improved the notes fetching logic to skip over any notes that are blank or contain only "#N/A". This ensures that only meaningful notes are included in the Slack messages, enhancing the clarity and relevance of the information shared.
