@@ -1,6 +1,6 @@
 /**
  * Slack Bot for Google Sheets Readout - Update Notification
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: Ryan Mioduski
  *
  * This script sends a notification to a specified Slack channel indicating that the
@@ -59,6 +59,7 @@ function sendUpdateNotification() {
       {
         type: "divider"
       },
+      /*
       {
         type: "actions",
         elements: [
@@ -71,6 +72,17 @@ function sendUpdateNotification() {
             },
             url: "https://github.com/ryanmio/SheetsToSlackBot/releases/tag/v3.0.0",
             action_id: "view_documentation"
+          }
+        ]
+      },
+      */
+      // Added context block for reauthentication reminder
+      {
+        type: "context",
+        elements: [
+          {
+            type: "mrkdwn",
+            text: "Please note: You will be asked to reauthenticate when running the bot for the first time."
           }
         ]
       }
