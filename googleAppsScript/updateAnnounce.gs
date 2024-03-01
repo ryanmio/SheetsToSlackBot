@@ -14,10 +14,9 @@
 
 // Configuration
 const UPDATE_NOTIFICATION_SLACK_CHANNEL_ID = 'U0127C7UF16'; // Update this with your channel ID
-const BOT_VERSION = 'v3.0.0'; // Update this with the new version number
+const BOT_VERSION = 'v3.0.1'; // Update this with the new version number
 const CHANGE_LOG = [
-  "Added automatic copying and pasting for since last update values.",
-  "Introduced dividers and block support for better message formatting, especially on mobile."
+  "Skip notes if blank or #N/A",
 ];
 // End Configuration
 
