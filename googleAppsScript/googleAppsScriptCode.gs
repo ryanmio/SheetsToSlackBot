@@ -40,18 +40,21 @@ function getNotes() {
   // Regular expression to match emoji patterns like :word:
   const emojiPattern = /^:[a-zA-Z0-9_]+:/;
 
-  // Filter out empty rows, rows with only "#N/A", and format notes
+  // Filter out empty rows, change rows with only "#N/A", and format notes
   const notes = notesValues
-    .filter(note => note[0].trim() !== '' && note[0].trim().toUpperCase() !== '#N/A') // Remove empty notes and notes with only "#N/A"
+    .filter(note => note[0].trim() !== '') // Remove empty notes
     .map(note => {
-      // Check if the note starts with an emoji pattern
-      const startsWithEmoji = emojiPattern.test(note[0].trim());
-      if (startsWithEmoji) {
+      const noteText = note[0].trim();
+      // Check if the note is "#N/A"
+      if (noteText.toUpperCase() === '#N/A') {
+        // Return "Error fetching note" for "#N/A"
+        return 'Error fetching note';
+      } else if (emojiPattern.test(noteText)) {
         // If it starts with an emoji, use it as is
-        return note[0].trim();
+        return noteText;
       } else {
         // If not, prefix the note with the :warning: emoji
-        return `:warning: ${note[0].trim()}`;
+        return `:warning: ${noteText}`;
       }
     });
   
