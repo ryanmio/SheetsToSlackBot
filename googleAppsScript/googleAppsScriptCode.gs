@@ -303,8 +303,13 @@ function sendSlackMessage() {
     slackMessageSuccess = false;
   }
 
-  // Perform copy-paste operation after sending the message
-  const copyPasteSuccess = copyPasteValues();
+  // Perform copy-paste operation only if the Slack message was successfully sent
+  let copyPasteSuccess = true; // Assume success unless proven otherwise
+  if (slackMessageSuccess) {
+    copyPasteSuccess = copyPasteValues();
+  } else {
+    console.log("Skipping copy-paste operation due to Slack message failure.");
+  }
 
   // Provide feedback to the user based on the operation outcomes
   if (slackMessageSuccess && copyPasteSuccess) {
