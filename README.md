@@ -25,6 +25,13 @@ Before using the bot, you need to configure it with the correct Slack channel ID
    const COPY_RANGE = 'B14:U17'; // Optional: Update this with your copy range
    const PASTE_RANGE = 'B26:U29'; // Optional: Update this with your paste range
    ```
+> **Obtaining Slack Channel ID:**  
+> To locate your Slack channel ID, follow these steps:  
+> 1. Open Slack and navigate to your desired channel.  
+> 2. Click on the channel name at the top to view channel details.  
+> 3. Find the channel ID either in the URL or the "About" section of the channel details.
+
+
 3. **Set Up OAuth Token as a Script Property:**
    - Go to the Script Editor by navigating to Extensions > Apps Script.
    - In the Apps Script editor, click on `File` > `Project properties` > `Script properties`.
@@ -35,13 +42,15 @@ Before using the bot, you need to configure it with the correct Slack channel ID
    
    This OAuth token is used for authentication with the Slack API and allows your script to post messages to your Slack workspace.
 
-4. **Save Changes:** After making the necessary changes, save the script file.
+4. **Deploy:** After making the necessary changes, you need to deploy the script to apply them. Follow these steps to deploy:
+   1. Click `Deploy` > `New Deployment`.
+   2. On the left sidebar, click the icon next to `Select Type`, then select `Web App`.
+      - **Description:** You can leave this empty or add the version number.
+      - **Deploy as:** Choose `User accessing the app`.
+      - **Who with access:** Select `Anyone within [Your Organization Name]`.
+   3. Click `Deploy` then `Done`. You can now close the page.
 
-### Obtaining Slack Channel ID
-To find your Slack channel ID:
-1. Open Slack and navigate to the channel you want to post messages to.
-2. Click on the channel name at the top to open the channel details.
-3. Look for the channel ID in the URL or in the "About" section of the channel details.
+
 
 ## Usage
 After configuring the bot, you can trigger the readout to be sent to Slack directly from your Google Sheets document.
